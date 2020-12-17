@@ -1,0 +1,15 @@
+select * from PEOPLE ;
+select * from LISTING_CATEGORY ;
+select * from RENTAL_BASIS ;
+select * from ADDRESS_STATE ;
+select * from ADDRESS_COUNTRY ;
+select * from ADDRESS_CITY ;
+select * from USER_ADDRESS ;
+select * from LISTINGS ;
+select * from EMPLOYEE_ADDRESS;
+select * from DEAL_STATUS ;
+select * from DEALS;
+select * from DESIGNATION;
+select * from CURRENT_STATUS;
+select * from ORDER_STATUS;
+select * from EMPLOYEE;
