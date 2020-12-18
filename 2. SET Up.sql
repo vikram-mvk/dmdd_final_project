@@ -14,9 +14,7 @@ EXCEPTION
         dbms_output.put_line(dbms_utility.format_error_backtrace);
         ROLLBACK;
 END HELP;
-
-GRANT EXECUTE ON HELP TO NEW_CUSTOMER;
-GRANT EXECUTE ON SIGNUP TO NEW_CUSTOMER;
+/
 
 --ALL ACTIONS OF REGISTERED CUSTOMERS
 CREATE OR REPLACE PROCEDURE ALL_ACTIONS
@@ -53,9 +51,12 @@ EXCEPTION
         ROLLBACK;
 END ALL_ACTIONS;
 
+/
+
 CREATE OR REPLACE PROCEDURE signup(user_name varchar,email varchar,pass_word varchar,first_name varchar,last_name varchar,phone_number number)
 IS 
 uid NUMBER;
+sqlstmt varchar(1000 char);
 BEGIN
   EXECUTE IMMEDIATE'alter session set "_ORACLE_SCRIPT"=true';  
   INSERT INTO PEOPLE(USERNAME, EMAIL,PASS_WORD, FIRST_NAME, LAST_NAME, PHONE_NUMBER) VALUES(user_name,email,pass_word,first_name,last_name,phone_number);
@@ -64,11 +65,49 @@ BEGIN
   COMMIT;
   SELECT USER_ID INTO uid FROM PEOPLE WHERE USERNAME=user_name;
   dbms_output.put_line(uid);
-  EXECUTE IMMEDIATE'CREATE OR REPLACE VIEW ADDRESS_'||user_name||' AS SELECT * FROM USER_ADDRESS WHERE USER_ID='||uid;
+  
+  sqlstmt :='CREATE OR REPLACE VIEW ADDRESS_'||user_name||' AS SELECT
+    user_address.address_id,
+    people.username,
+    user_address.address_line_1,
+    user_address.address_line_2,
+    zip_code,
+    address_city.city_name,
+    address_state.state_name,
+    address_country.country_name
+FROM
+    user_address
+INNER JOIN address_city
+        USING(city_id)
+INNER JOIN address_state
+        USING(state_id)
+INNER JOIN address_country
+        USING(country_id)
+INNER JOIN people
+        USING(user_id) where user_id='||uid;
+        
+  EXECUTE IMMEDIATE sqlstmt;
+  dbms_output.put_line('address view created');
+
   EXECUTE IMMEDIATE'CREATE OR REPLACE VIEW PEOPLE_'||user_name||' AS SELECT * FROM PEOPLE WHERE USER_ID='||uid;
-  EXECUTE IMMEDIATE'GRANT SELECT TO PEOPLE_'||user_name||' TO '||user_name;
-  EXECUTE IMMEDIATE'GRANT SELECT TO ADDRESS_'||user_name||' TO '||user_name;
-  EXECUTE IMMEDIATE'GRANT EXECUTE ON ALL_ACTIONS TO '||user_name;
+   dbms_output.put_line('people view created');
+    COMMIT;
+    
+    sqlstmt := 'GRANT SELECT ON PEOPLE_'||user_name||' TO '||user_name;
+    
+  EXECUTE IMMEDIATE sqlstmt;
+     dbms_output.put_line('people view granted');
+    
+    sqlstmt := 'GRANT SELECT ON ADDRESS_'||user_name||' TO '||user_name;
+
+  EXECUTE IMMEDIATE sqlstmt;
+       dbms_output.put_line('address view granted');
+
+    sqlstmt := 'GRANT EXECUTE ON ALL_ACTIONS TO '||user_name;
+
+  EXECUTE IMMEDIATE sqlstmt;
+       dbms_output.put_line('all actions granted');
+
   COMMIT;
 EXCEPTION
     WHEN OTHERS THEN
@@ -77,38 +116,9 @@ EXCEPTION
         ROLLBACK;
 END;
 
-CREATE OR REPLACE TRIGGER Order_Creation_trg
-    AFTER
-    INSERT OR UPDATE
-    ON DEALS
-    FOR EACH ROW
-BEGIN
-   IF INSERTING THEN
-   IF (:NEW.STATUS_ID = 2) THEN
-   INSERT INTO ORDER_STATUS(STATUS_ID,DEALS_ID) VALUES(1,:NEW.DEALS_ID);
-   END IF;
-   END IF;
-   IF UPDATING THEN
-   IF (:OLD.STATUS_ID = 1 AND :NEW.STATUS_ID = 2) THEN
-   INSERT INTO ORDER_STATUS(STATUS_ID,DEALS_ID) VALUES(1,:NEW.DEALS_ID);
-   END IF;
-   END IF;
-END;
+/
 
 
-
-
-
-
-
-
-
-
- 
-
-
-
-
-
-
+GRANT EXECUTE ON HELP TO NEW_CUSTOMER;
+GRANT EXECUTE ON SIGNUP TO NEW_CUSTOMER;
 
