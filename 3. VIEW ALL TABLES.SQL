@@ -1,16 +1,19 @@
+SET SERVEROUTPUT ON;
+
 select * from PEOPLE ; --need view
-select * from LISTING_CATEGORY ;
-select * from RENTAL_BASIS ;
-select * from ADDRESS_STATE ;
-select * from ADDRESS_COUNTRY ;
-select * from ADDRESS_CITY ;
+select * from LISTING_CATEGORY ; --PUBLIC
+select * from RENTAL_BASIS ;--PUBLIC
+select * from ADDRESS_STATE ;--PUBLIC
+select * from ADDRESS_COUNTRY ;--PUBLIC
+select * from ADDRESS_CITY ;--PUBLIC
 select * from USER_ADDRESS ; --need view
-select * from LISTINGS; 
-select * from EMPLOYEE_ADDRESS;
-select * from DEAL_STATUS;
-select * from DEALS;
-select * from DESIGNATION;
-select * from CURRENT_STATUS;
-select * from ORDER_STATUS;
-select * from EMPLOYEE;
+select * from LISTINGS; --PUBLIC
+select * from EMPLOYEE_ADDRESS;--NO ACCESS
+select * from DEAL_STATUS;--PUBLIC
+select * from DEALS; --NEED VIEW
+select * from DESIGNATION;--NO ACCESS
+select * from CURRENT_STATUS;--NEED VIEW
+select * from ORDER_STATUS;--NEED VIEW
+select * from EMPLOYEE;--NO ACCESS
+
 
